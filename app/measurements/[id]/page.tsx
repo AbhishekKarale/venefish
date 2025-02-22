@@ -3,15 +3,15 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Measurement } from '@/lib/types/measurement';
-import { measurementService } from '@/lib/services/measurementService';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Image as ImageIcon } from 'lucide-react';
-import Link from 'next/link';
+import { useMeasurementService } from '@/lib/hooks/useMeasurementService';
 
 export default function MeasurementDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const measurementService = useMeasurementService();
   const [measurement, setMeasurement] = useState<Measurement | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
@@ -22,7 +22,7 @@ export default function MeasurementDetailPage() {
       setMeasurement(data);
     };
     loadMeasurement();
-  }, [params?.id]);
+  }, [params?.id, measurementService]);
 
   if (!measurement) {
     return (

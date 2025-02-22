@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { measurementService } from '@/lib/services/measurementService';
 import { Measurement } from '@/lib/types/measurement';
 import Link from 'next/link';
 import { Search, Image as ImageIcon } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { useMeasurementService } from '@/lib/hooks/useMeasurementService';
 
 export default function HomePage() {
+  const measurementService = useMeasurementService();
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredMeasurements, setFilteredMeasurements] = useState<Measurement[]>([]);
@@ -21,7 +22,7 @@ export default function HomePage() {
       setFilteredMeasurements(data);
     };
     loadMeasurements();
-  }, []);
+  }, [measurementService]);
 
   useEffect(() => {
     const filtered = measurements.filter(measurement => {
