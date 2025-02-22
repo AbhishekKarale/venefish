@@ -64,7 +64,6 @@ export function MeasurementForm({ measurement, onClose }: MeasurementFormProps) 
 
   const handleImageUpload = async (file: File): Promise<MeasurementImage> => {
     if (!measurement?.id) {
-      // For new measurements, we'll use a temporary ID
       const tempId = Date.now().toString();
       return measurementService.uploadImage(file, tempId);
     }
@@ -74,8 +73,6 @@ export function MeasurementForm({ measurement, onClose }: MeasurementFormProps) 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       setIsSubmitting(true);
-
-      // Handle image uploads first
       const imagePromises = data.images
         .filter((img) => img.file)
         .map((img) => handleImageUpload(img.file as File));
@@ -90,18 +87,11 @@ export function MeasurementForm({ measurement, onClose }: MeasurementFormProps) 
 
       if (measurement?.id) {
         await measurementService.update(measurement.id, finalData);
-        toast({
-          title: 'Success',
-          description: 'Measurement updated successfully',
-        });
+        toast({ title: 'Success', description: 'Measurement updated successfully' });
       } else {
         await measurementService.create(finalData);
-        toast({
-          title: 'Success',
-          description: 'Measurement created successfully',
-        });
+        toast({ title: 'Success', description: 'Measurement created successfully' });
       }
-
       onClose();
     } catch (error) {
       toast({
@@ -242,9 +232,6 @@ export function MeasurementForm({ measurement, onClose }: MeasurementFormProps) 
                     />
                   </FormControl>
                   <FormMessage />
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Optional: Add references for the normal values
-                  </p>
                 </FormItem>
               )}
             />
