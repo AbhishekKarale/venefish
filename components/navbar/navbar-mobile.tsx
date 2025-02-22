@@ -23,22 +23,10 @@ export const NavbarMobile = () => {
             </NavigationMenuTrigger>
             <NavigationMenuContent className="flex flex-col p-1">
               <NavigationMenuLink
-                href="#1"
+                href="/admin/measurements"
                 className={buttonVariants({ variant: "link" })}
               >
-                Item 1
-              </NavigationMenuLink>
-              <NavigationMenuLink
-                href="#2"
-                className={buttonVariants({ variant: "link" })}
-              >
-                Item 2
-              </NavigationMenuLink>
-              <NavigationMenuLink
-                href="#3"
-                className={buttonVariants({ variant: "link" })}
-              >
-                Item 3
+                Measurements
               </NavigationMenuLink>
               <div className="flex flex-col mb-0.5">
                 <NavbarUserLinks />

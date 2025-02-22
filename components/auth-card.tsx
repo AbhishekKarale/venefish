@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useUser } from "reactfire";
 
@@ -17,12 +17,16 @@ export const AuthCard = () => {
   const [isShowingSignUp, setIsShowingSignUp] = useState<boolean>(false);
   const { data: user } = useUser();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (user) {
-      router.push("/app");
+      // Get the redirect URL from the query parameters, default to /app
+      const redirectTo = searchParams.get('redirectTo') || '/app';
+      router.push(redirectTo);
     }
-  }, [user]);
+  }, [user, router, searchParams]);
+
   return (
     <>
       <Card>
