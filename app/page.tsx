@@ -7,35 +7,20 @@ import { Measurement } from '@/lib/types/measurement';
 import Link from 'next/link';
 import { Search, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { useMeasurementService } from '@/lib/hooks/useMeasurementService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useMeasurements } from '@/lib/hooks/useMeasurements';
+import { useRouter } from 'next/navigation';
+import { ImageWithLoading } from '@/components/ui/image-with-loading';
 
 export default function HomePage() {
-  const measurementService = useMeasurementService();
-  const [measurements, setMeasurements] = useState<Measurement[]>([]);
+  const router = useRouter();
+  const { measurements, isLoading } = useMeasurements();
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredMeasurements, setFilteredMeasurements] = useState<Measurement[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
-
-  useEffect(() => {
-    const loadMeasurements = async () => {
-      setIsLoading(true);
-      try {
-        const data = await measurementService.getAll();
-        setMeasurements(data);
-        setFilteredMeasurements(data);
-      } catch (error) {
-        console.error('Failed to load measurements:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadMeasurements();
-  }, [measurementService]);
 
   useEffect(() => {
     setIsSearching(true);
@@ -51,16 +36,31 @@ export default function HomePage() {
     setTimeout(() => setIsSearching(false), 300);
   }, [debouncedSearchQuery, measurements]);
 
+  const handleMeasurementClick = (e: React.MouseEvent<HTMLAnchorElement>, measurement: Measurement) => {
+    e.preventDefault();
+    // Prefetch the measurement page
+    router.prefetch(`/measurements/${measurement.id}`);
+    // Navigate to the measurement page
+    router.push(`/measurements/${measurement.id}`);
+  };
+
   const LoadingSkeleton = () => (
     <>
       {[1, 2, 3, 4, 5, 6].map((i) => (
-        <Card key={i} className="overflow-hidden">
-          <div className="h-48 w-full">
+        <Card key={i} className="overflow-hidden h-[420px] flex flex-col">
+          <div className="h-52 w-full flex-shrink-0">
             <Skeleton className="h-full w-full" />
           </div>
-          <CardHeader className="pb-2">
-            <Skeleton className="h-4 w-24 mb-2" />
-            <Skeleton className="h-6 w-full" />
+          <CardHeader className="pb-2 flex-1 min-h-[220px] p-6">
+            <div className="flex items-center justify-between mb-3">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-7 w-32 rounded-full" />
+            </div>
+            <Skeleton className="h-7 w-full mb-2" />
+            <Skeleton className="h-7 w-[90%] mb-4" />
+            <Skeleton className="h-4 w-full mb-2" />
+            <Skeleton className="h-4 w-full mb-2" />
+            <Skeleton className="h-4 w-[80%]" />
           </CardHeader>
         </Card>
       ))}
@@ -129,14 +129,25 @@ export default function HomePage() {
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                 >
-                  <Link href={`/measurements/${measurement.id}`}>
-                    <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 border-gray-200 dark:border-gray-700 overflow-hidden group dark:bg-gray-800 transform hover:scale-[1.02]">
-                      <div className="relative h-48 w-full bg-gray-100 dark:bg-gray-700">
+                  <Link 
+                    href={`/measurements/${measurement.id}`} 
+                    key={measurement.id}
+                    onClick={(e) => handleMeasurementClick(e, measurement)}
+                  >
+                    <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 border-gray-200 dark:border-gray-700 overflow-hidden group dark:bg-gray-800 transform hover:scale-[1.02] h-[420px] flex flex-col">
+                      <div className="relative h-52 w-full bg-gray-100 dark:bg-gray-700 flex-shrink-0">
                         {measurement.images.length > 0 ? (
-                          <img
+                          <ImageWithLoading
                             src={measurement.images[0].url}
                             alt={measurement.images[0].caption}
-                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            className="object-cover group-hover:scale-105"
+                            loading="lazy"
+                            onError={(e) => {
+                              const imgElement = e.target as HTMLImageElement;
+                              imgElement.style.display = 'none';
+                            }}
                           />
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500">
@@ -144,16 +155,24 @@ export default function HomePage() {
                           </div>
                         )}
                         {measurement.images.length > 1 && (
-                          <div className="absolute bottom-2 right-2 bg-black/70 text-white text-sm px-2 py-1 rounded-md">
+                          <div className="absolute bottom-2 right-2 bg-black/70 text-white text-sm px-2 py-1 rounded-md z-10">
                             +{measurement.images.length - 1} more
                           </div>
                         )}
                       </div>
-                      <CardHeader className="pb-2">
-                        <div className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">
-                          {measurement.category}
+                      <CardHeader className="pb-2 flex-1 min-h-[220px] p-6">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                            {measurement.category}
+                          </div>
+                          <div className="text-sm font-medium px-3 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 rounded-full">
+                            Normal: {measurement.normalValue}
+                          </div>
                         </div>
-                        <CardTitle className="text-xl">{measurement.title}</CardTitle>
+                        <CardTitle className="text-xl mb-4 leading-tight">{measurement.title}</CardTitle>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-4">
+                          {measurement.description}
+                        </p>
                       </CardHeader>
                     </Card>
                   </Link>
