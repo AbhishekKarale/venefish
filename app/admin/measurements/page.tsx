@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useUser } from 'reactfire';
 import { useRouter } from 'next/navigation';
 import { Measurement } from '@/lib/types/measurement';
-import { measurementService } from '@/lib/services/measurementService';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -16,10 +15,12 @@ import {
 } from '@/components/ui/table';
 import { toast } from '@/components/ui/use-toast';
 import { MeasurementForm } from './measurement-form';
+import { useMeasurementService } from '@/lib/hooks/useMeasurementService';
 
 export default function MeasurementsAdminPage() {
   const { data: user } = useUser();
   const router = useRouter();
+  const measurementService = useMeasurementService();
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedMeasurement, setSelectedMeasurement] = useState<Measurement | null>(null);
@@ -30,7 +31,7 @@ export default function MeasurementsAdminPage() {
       return;
     }
     loadMeasurements();
-  }, [user]);
+  }, [user, router, measurementService]);
 
   const loadMeasurements = async () => {
     try {

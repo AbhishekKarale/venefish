@@ -15,6 +15,7 @@ export interface Measurement {
   normalValue: string;
   searchTerms: string[];
   title: string;
+  references?: string[];
 }
 
 export type MeasurementFormData = Omit<Measurement, 'id' | 'createdAt' | 'updatedAt'>;

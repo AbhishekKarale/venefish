@@ -138,6 +138,22 @@ export default function MeasurementDetailPage() {
                     </p>
                   </div>
 
+                  {/* References */}
+                  {measurement.references && measurement.references.length > 0 && (
+                    <div>
+                      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                        References
+                      </h2>
+                      <ul className="list-disc list-inside space-y-1">
+                        {measurement.references.map((reference, index) => (
+                          <li key={index} className="text-gray-600 dark:text-gray-300">
+                            {reference}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
                   {/* Search Terms */}
                   {measurement.searchTerms.length > 0 && (
                     <div>

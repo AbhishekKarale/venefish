@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Measurement, MeasurementFormData, MeasurementImage } from '@/lib/types/measurement';
-import { measurementService } from '@/lib/services/measurementService';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -25,6 +24,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/use-toast';
 import { X } from 'lucide-react';
+import { useMeasurementService } from '@/lib/hooks/useMeasurementService';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -32,6 +32,7 @@ const formSchema = z.object({
   description: z.string().min(1, 'Description is required'),
   normalValue: z.string().min(1, 'Normal value is required'),
   searchTerms: z.array(z.string()),
+  references: z.array(z.string()).optional().default([]),
   images: z.array(z.object({
     caption: z.string(),
     url: z.string(),
@@ -46,6 +47,7 @@ interface MeasurementFormProps {
 
 export function MeasurementForm({ measurement, onClose }: MeasurementFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const measurementService = useMeasurementService();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -55,6 +57,7 @@ export function MeasurementForm({ measurement, onClose }: MeasurementFormProps) 
       description: measurement?.description || '',
       normalValue: measurement?.normalValue || '',
       searchTerms: measurement?.searchTerms || [],
+      references: measurement?.references || [],
       images: measurement?.images || [],
     },
   });
@@ -134,6 +137,11 @@ export function MeasurementForm({ measurement, onClose }: MeasurementFormProps) 
   const handleSearchTermsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const terms = event.target.value.split(',').map((term) => term.trim());
     form.setValue('searchTerms', terms);
+  };
+
+  const handleReferencesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const refs = event.target.value.split(',').map((ref) => ref.trim());
+    form.setValue('references', refs);
   };
 
   return (
@@ -216,6 +224,27 @@ export function MeasurementForm({ measurement, onClose }: MeasurementFormProps) 
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="references"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>References (comma-separated)</FormLabel>
+                  <FormControl>
+                    <Input
+                      value={field.value.join(', ')}
+                      onChange={handleReferencesChange}
+                      placeholder="e.g., Smith et al. 2020, Journal of Radiology 2019"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Optional: Add references for the normal values
+                  </p>
                 </FormItem>
               )}
             />
