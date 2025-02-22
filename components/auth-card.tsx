@@ -21,8 +21,8 @@ export const AuthCard = () => {
 
   useEffect(() => {
     if (user) {
-      // Get the redirect URL from the query parameters, default to /app
-      const redirectTo = searchParams.get('redirectTo') || '/app';
+      // Get the redirect URL from the query parameters, default to homepage
+      const redirectTo = searchParams?.get('redirectTo') || '/';
       router.push(redirectTo);
     }
   }, [user, router, searchParams]);
@@ -33,7 +33,7 @@ export const AuthCard = () => {
         <CardHeader>
           <CardTitle>{isShowingSignUp ? "Sign Up" : "Sign In"}</CardTitle>
           <CardDescription>
-            Give them a reason to {isShowingSignUp ? "sign up" : "sign in"}.
+            Sign {isShowingSignUp ? "up" : "in"} to access measurements
           </CardDescription>
         </CardHeader>
         <CardContent>
