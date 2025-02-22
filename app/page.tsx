@@ -39,13 +39,13 @@ export default function HomePage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto py-12 px-4">
         {/* Title Section */}
-        <div className="text-center mb-12 relative">
-          <div className="absolute right-0 top-0">
+        <div className="flex flex-col items-center mb-12">
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <h1 className="text-5xl font-bold text-gray-900 dark:text-white">
+              Radiology Normal Values
+            </h1>
             <ThemeToggle />
           </div>
-          <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            Radiology Normal Values
-          </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             A comprehensive collection of radiological measurements and their normal ranges
           </p>
